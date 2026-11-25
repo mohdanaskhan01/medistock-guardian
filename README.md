@@ -1,181 +1,90 @@
-# MediStock Guardian – AWS Cloud Infrastructure, Deployment & Serverless Operations
+# MediStock Guardian – AWS Cloud Infrastructure
 
 [![AWS Region](https://img.shields.io/badge/AWS%20Region-ap--south--2%20(Hyderabad)-FF9900?logo=amazon-aws&logoColor=white)](https://aws.amazon.com/)
-[![Ubuntu](https://img.shields.io/badge/Host%20OS-Ubuntu%2024.04%20LTS-E95420?logo=ubuntu&logoColor=white)](https://ubuntu.com/)
+[![Ubuntu](https://img.shields.io/badge/Host-Ubuntu%2024.04%20EC2-E95420?logo=ubuntu&logoColor=white)](https://ubuntu.com/)
 [![Reverse Proxy](https://img.shields.io/badge/Reverse%20Proxy-Nginx-009639?logo=nginx&logoColor=white)](https://nginx.org/)
-[![Database](https://img.shields.io/badge/NoSQL-Amazon%20DynamoDB%20(7%20Tables)-4053D6?logo=amazondynamodb&logoColor=white)](https://aws.amazon.com/dynamodb/)
+[![Database](https://img.shields.io/badge/NoSQL-Amazon%20DynamoDB-4053D6?logo=amazondynamodb&logoColor=white)](https://aws.amazon.com/dynamodb/)
 [![Serverless](https://img.shields.io/badge/Automation-Lambda%20%2B%20EventBridge%20%2B%20SNS-FF4F8B?logo=awslambda&logoColor=white)](https://aws.amazon.com/lambda/)
 
-> **Project Scope & Contribution:**
-> This repository documents the production AWS cloud architecture, server provisioning, security hardening, and serverless automation implemented by **Mohammed Anasullah Khan** for a pre-built full-stack medical inventory and expiry tracking system. 
-> 
-> All infrastructure, networking, least-privilege IAM policies, systemd process management, Nginx reverse proxy configuration, and automated event-driven Lambda monitors were architected, deployed, and verified live in **AWS Asia Pacific (Hyderabad – `ap-south-2`)**.
+Production AWS cloud infrastructure and automated monitoring for a full-stack medical inventory tracking application deployed in **AWS Asia Pacific (Hyderabad – `ap-south-2`)**.
 
 ---
 
-## Cloud Architecture (`ap-south-2`)
+## Architecture Diagram
 
 ```mermaid
-flowchart TD
-    subgraph Clients["External Access"]
-        User["Clinic Operations & Pharmacy Staff"]
+flowchart LR
+    Users(["Users / Staff"]) -->|HTTP Port 80| Nginx["Nginx Reverse Proxy<br/>(Ubuntu EC2)"]
+    
+    subgraph EC2["EC2 Instance (t3.micro)"]
+        Nginx -->|Static Assets| Frontend["React Frontend"]
+        Nginx -->|/api/| Backend["FastAPI Backend<br/>(systemd service)"]
     end
 
-    subgraph VPC["Amazon VPC (10.20.0.0/16) - ap-south-2 (Hyderabad)"]
-        subgraph PublicSubnet["Public Subnet (10.20.1.0/24)"]
-            SG["Security Group: medistock-ec2-sg<br/>• Inbound HTTP (TCP 80)<br/>• Inbound SSH (TCP 22)"]
-            
-            subgraph EC2["Ubuntu 24.04 LTS (t3.micro)"]
-                Nginx["Nginx Reverse Proxy (:80)"]
-                StaticFiles["Static Web Frontend Assets"]
-                Systemd["systemd: medistock-api.service<br/>(FastAPI on 127.0.0.1:8000)"]
-            end
-        end
+    Backend -->|Read / Write| DynamoDB[("DynamoDB<br/>(7 Tables)")]
+    Backend -->|Pre-signed URLs| S3[("S3 Bucket<br/>(Supplier Docs)")]
+    Backend -->|App Logs| CloudWatch["CloudWatch Logs"]
 
-        subgraph ServerlessExecution["Serverless Operations"]
-            EventBridge["Amazon EventBridge<br/>(cron: Daily 07:00 UTC)"]
-            Lambda["AWS Lambda Function<br/>(inventory_monitor.py)"]
-        end
-
-        subgraph IAMRoles["IAM Least-Privilege Execution"]
-            EC2Role["MediStockEC2Role<br/>(EC2 Instance Profile - Keyless)"]
-            LambdaRole["MediStockLambdaRole<br/>(Execution Policy)"]
-        end
-
-        subgraph AWSServices["AWS Managed Services (ap-south-2)"]
-            DynamoDB[("Amazon DynamoDB<br/>• 7 On-Demand Tables<br/>(Locations, Supplies, Batches,<br/>Movements, Reorders, Alerts, Docs)")]
-            S3[("Amazon S3 Private Bucket<br/>(medistock-guardian-supplier-docs)<br/>Pre-signed URL Access")]
-            CloudWatch["Amazon CloudWatch Logs<br/>(/medistock-guardian/application)"]
-            SNS["Amazon SNS Topic<br/>(MediStockAlertsTopic)"]
-        end
+    subgraph Serverless["Automated Expiry & Shortage Monitor"]
+        EventBridge["EventBridge<br/>(Daily Cron)"] -->|Triggers| Lambda["AWS Lambda"]
+        Lambda -->|Check Stock| DynamoDB
+        Lambda -->|Alerts| SNS["Amazon SNS"]
+        SNS -->|Email Notification| Staff(["Hospital Staff"])
     end
-
-    subgraph AlertsChannel["Notification Channels"]
-        Email["Email Subscribers (Pharmacy & Inventory Leads)"]
-    end
-
-    %% Inbound flow
-    User -->|HTTP :80| SG
-    SG --> Nginx
-    Nginx -->|Serve static UI| StaticFiles
-    Nginx -->|Proxy /api/| Systemd
-
-    %% EC2 IAM permissions and outbound
-    EC2 --- EC2Role
-    Systemd -->|boto3 query/scan/put| DynamoDB
-    Systemd -->|boto3 pre-signed URLs| S3
-    Systemd -->|Structured JSON logging| CloudWatch
-    Systemd -->|Publish manual alerts| SNS
-
-    %% Serverless event loop
-    EventBridge -->|Scheduled trigger| Lambda
-    Lambda --- LambdaRole
-    Lambda -->|Scan stock & 30d expiry| DynamoDB
-    Lambda -->|Write active alerts| DynamoDB
-    Lambda -->|Dispatch critical alerts| SNS
-    Lambda -->|Execution telemetry| CloudWatch
-
-    %% Notification delivery
-    SNS -->|Email alert dispatch| Email
 ```
 
 ---
 
-## AWS & Linux Engineering Highlights
+## How It Works (Simple Overview)
 
-### 1. Compute & Reverse Proxy (`EC2` + `Nginx` + `systemd`)
-- **Host Sizing & Memory Tuning:** Provisioned an AWS EC2 `t3.micro` instance running **Ubuntu 24.04 LTS** in `ap-south-2`. Configured a 1 GB swap file (`/swapfile`) with `vm.swappiness=10` to maintain OS responsiveness and prevent out-of-memory kernel panics during frontend build operations.
-- **Nginx Reverse Proxy:** Configured Nginx to listen on port `80`, serve the optimized production static web build directly from the filesystem, and reverse-proxy all dynamic API calls (`/api/`) internally to `http://127.0.0.1:8000`.
-- **Process Supervision (`systemd`):** Configured and enabled `medistock-api.service` under `systemd` to supervise the Python backend process, enforce zero-downtime automatic restarts on failure (`Restart=always`, `RestartSec=5s`), and capture stdout/stderr to syslog.
-
-### 2. Zero-Credential IAM Security (`IAM`)
-- **Keyless Runtime Architecture:** Eliminated permanent, static AWS access keys (`AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`) from the production server.
-- **Instance Profile & Scoped Policies:** Created and attached the `MediStockEC2Role` IAM role via an EC2 Instance Profile. Both the EC2 instance and the Lambda function assume scoped, least-privilege IAM policies (`aws/iam/medistock-policy.json`) strictly limited to the required DynamoDB table ARNs, private S3 bucket, CloudWatch log group, and SNS topic ARN.
-
-### 3. Network & Perimeter Hardening (`VPC` & `Security Groups`)
-- **Strict Inbound Firewall:** Hardened `medistock-ec2-sg` to restrict inbound network traffic exclusively to `TCP 80` (HTTP web traffic) and `TCP 22` (SSH administrative access restricted to administrator IP).
-- **Internal Port Isolation:** Completely blocked public internet access to application backend ports (`8000` and `3000`), ensuring backend services bind exclusively to localhost and are reachable only via the local Nginx proxy.
-
-### 4. Cloud Storage & NoSQL Provisioning (`DynamoDB` & `S3`)
-- **7 On-Demand DynamoDB Tables:** Provisioned seven dedicated tables with single-table partition key schemas (`id: string`) and Pay-Per-Request (On-Demand) capacity mode for optimal cost efficiency:
-  - `MediStock_Locations`
-  - `MediStock_Supplies`
-  - `MediStock_Batches`
-  - `MediStock_Movements`
-  - `MediStock_Reorders`
-  - `MediStock_Alerts`
-  - `MediStock_Documents`
-- **Private S3 Bucket with Pre-Signed URLs:** Created a private Amazon S3 bucket (`medistock-guardian-supplier-docs`) with public access blocked. All supplier documentation (invoices, certificates, safety data sheets) is uploaded and retrieved through secure, time-limited IAM-generated pre-signed URLs.
-
-### 5. Serverless Automated Monitoring (`Lambda` + `EventBridge` + `SNS`)
-- **Scheduled Expiry & Shortage Scanning:** Configured an Amazon EventBridge rule running on a daily cron expression (`cron(0 7 * * ? *)`) to trigger an autonomous AWS Lambda function (`aws/lambda/inventory_monitor.py`).
-- **Real-Time Notification Pipeline:** The Lambda function evaluates usable inventory across all locations against configured minimum stock levels and detects batches within the 30-day expiration window. Any triggered alerts are committed to `MediStock_Alerts` and instantly published via **Amazon SNS** (`MediStockAlertsTopic`) to alert pharmacy managers via email.
-
-### 6. Centralized Observability (`CloudWatch`)
-- Configured structured JSON application logging to CloudWatch Logs group `/medistock-guardian/application`.
-- Captured both API transaction logs and Lambda monitoring execution summaries (`suppliesChecked`, `batchesChecked`, `alertsTriggered`) for auditable tracking and operational troubleshooting.
+* **EC2 & Nginx:** A single Ubuntu `t3.micro` instance hosts the app. Nginx serves the frontend web pages and forwards API calls to the backend on port `8000`.
+* **systemd Service:** The Python API runs as a systemd background service (`medistock-api.service`) so it automatically starts on boot and restarts if it fails.
+* **IAM Security (No hardcoded keys):** The EC2 instance and Lambda function use IAM Roles to talk to DynamoDB, S3, SNS, and CloudWatch without saving any access keys on the server.
+* **DynamoDB:** Stores all locations, supplies, batches, movements, reorders, alerts, and documents across 7 tables.
+* **Amazon S3:** Stores uploaded supplier PDF/image documents privately. Users access them via secure, temporary pre-signed links.
+* **Daily Cron Monitor (EventBridge + Lambda + SNS):** Runs every day at `07:00 UTC` to check for low stock or items expiring within 30 days. If an item is low or expiring, Lambda sends an email alert to staff via SNS.
+* **CloudWatch:** Captures server and monitoring logs in one place for troubleshooting.
 
 ---
 
-## Repository & Infrastructure Layout
+## Repository Structure
 
 ```text
 ├── aws/
-│   ├── ec2/
-│   │   └── deploy.sh               # Ubuntu host package installation, build & setup runbook
-│   ├── iam/
-│   │   └── medistock-policy.json   # Least-privilege IAM policy (DynamoDB, S3, SNS, CloudWatch)
-│   ├── lambda/
-│   │   └── inventory_monitor.py    # Autonomous EventBridge-scheduled inventory & expiry scanner
-│   └── vpc/
-│       └── vpc-setup.md            # VPC subnet allocation, gateway endpoints & security group spec
+│   ├── ec2/deploy.sh               # EC2 package setup and build script
+│   ├── iam/medistock-policy.json   # IAM least-privilege security policy
+│   ├── lambda/inventory_monitor.py # Scheduled stock & expiry monitor
+│   └── vpc/vpc-setup.md            # Network & Security Group guide
 ├── docs/
-│   └── screenshots/                # Verified live AWS deployment evidence (ap-south-2)
-│       ├── 01-live-dashboard.jpg
-│       ├── 02-dynamodb-tables.jpg
-│       ├── 03-lambda-eventbridge.jpg
-│       └── 04-sns-alert.jpeg
-├── backend-python/                 # Pre-built Python FastAPI runtime service (port 8000)
-├── src/                            # Pre-built React + Vite web dashboard UI
-├── server.ts                       # Alternative Express runtime layer
-├── .env.example                    # Clean, sanitized environment configuration template
-└── .gitignore                      # Hardened ignore rules preventing secret or artifact leaks
+│   ├── DEPLOYMENT.md               # Step-by-step production runbook
+│   └── screenshots/                # Live proof from AWS console & app
+├── backend-python/                 # Python FastAPI backend service
+├── src/                            # React dashboard frontend
+└── .env.example                    # Environment variable template
 ```
 
 ---
 
-## Production Deployment & Cloud Architecture (AWS)
+## Deployment Summary
 
-MediStock Guardian is engineered for high-availability, zero-credential production deployment in the **AWS Asia Pacific (Hyderabad) `ap-south-2`** region. 
+For full setup commands, see the **[Production Deployment Runbook](docs/DEPLOYMENT.md)**.
 
-### Infrastructure Overview
-
-* **Compute & Process Management:** Deployed on an Ubuntu 24.04 LTS EC2 instance configured with swap memory for build stability. The Python FastAPI backend runs as a managed `systemd` daemon (`medistock-api.service`) with automatic restart policies to guarantee continuous uptime.
-* **Reverse Proxy & Static Serving:** An Nginx reverse proxy sits in front of the application, serving the compiled Vite frontend assets directly while routing `/api/` traffic internally to the Uvicorn application server.
-* **Keyless Security (IAM):** Eliminates hardcoded AWS credentials in production. The EC2 host uses an attached IAM Instance Profile to authenticate natively with AWS services, following the principle of least privilege.
-* **Data, Storage & Observability:**
-  * **Amazon DynamoDB:** Seven dedicated tables (`Locations`, `Supplies`, `Batches`, `Movements`, `Reorders`, `Alerts`, and `Documents`) for low-latency inventory tracking.
-  * **Amazon S3:** Secure object storage for supplier invoices and compliance documentation.
-  * **Amazon CloudWatch:** Centralized application logging (`/medistock-guardian/application`) for real-time monitoring and debugging.
-* **Event-Driven Automation:** An Amazon EventBridge scheduled cron rule (`07:00 UTC` daily) invokes the `mediStock-inventory-monitor` AWS Lambda function to audit stock thresholds, detect expiring batches, and publish notifications via **Amazon SNS**.
-
-> **Full Setup Guide:** For step-by-step server provisioning, `.env` configuration, Nginx server blocks, and AWS CLI commands, refer to the complete [Production Deployment Runbook](docs/DEPLOYMENT.md).
+1. **Launch EC2:** Ubuntu 24.04 `t3.micro` in `ap-south-2` with Security Group allowing port 80 (HTTP) and port 22 (SSH).
+2. **Attach IAM Role:** Attach `MediStockEC2Role` to the EC2 instance for keyless AWS access.
+3. **Run Setup:** Clone repo and run `./aws/ec2/deploy.sh` to install dependencies and build the app.
+4. **Start systemd Service:** Enable and start `medistock-api.service`.
+5. **Start Nginx:** Configure reverse proxy to route web traffic to the app.
+6. **Set up EventBridge:** Schedule the Lambda function daily (`cron(0 7 * * ? *)`) to send alerts via SNS.
 
 ---
 
-## Live Deployment Verification (`ap-south-2`)
+## Live Deployment Proof (`ap-south-2`)
 
 | **Live Dashboard on EC2 + Nginx** | **7 Active DynamoDB Tables (`ap-south-2`)** |
 |:---:|:---:|
 | ![Live Dashboard](docs/screenshots/01-live-dashboard.jpg) | ![DynamoDB Tables](docs/screenshots/02-dynamodb-tables.jpg) |
-| *Production web UI served via Nginx on Ubuntu 24.04 EC2* | *7 On-Demand tables provisioned in Asia Pacific (Hyderabad)* |
 | **Scheduled Lambda + EventBridge Scan** | **Automated Amazon SNS Email Notification** |
 | ![Lambda Execution](docs/screenshots/03-lambda-eventbridge.jpg) | ![SNS Email Alert](docs/screenshots/04-sns-alert.jpeg) |
-| *Automated test run: 5 supplies & 5 batches scanned, 5 alerts logged* | *Real-time shortage alert dispatched to staff subscriber inbox* |
-
----
-
-> **Live System Walkthrough:** A screen recording demonstrating the live UI on EC2 interacting with the AWS backend and recording real-time inventory adjustments is included in [docs/medistock-demo.mp4](docs/medistock-demo.mp4).
 
 ---
 

@@ -1,11 +1,18 @@
-## Production Deployment Runbook
+# Production Deployment Runbook
 
-### 1. Provision EC2 Host & Prepare Swap
+A simple step-by-step guide to deploying MediStock Guardian on AWS in **Asia Pacific (Hyderabad – `ap-south-2`)**.
+
+---
+
+### Step 1: Connect to EC2 and Add Swap Space
+
+Create a 1 GB swap file to give your `t3.micro` instance extra memory during builds:
+
 ```bash
-# Connect to your Ubuntu 24.04 LTS instance in ap-south-2
+# Connect to your instance
 ssh -i your-key.pem ubuntu@<EC2_PUBLIC_IP>
 
-# Configure 1 GB swap space to support memory overhead during builds
+# Create and enable 1GB swap file
 sudo fallocate -l 1G /swapfile
 sudo chmod 600 /swapfile
 sudo mkswap /swapfile
@@ -13,22 +20,26 @@ sudo swapon /swapfile
 echo '/swapfile none swap sw 0 0' | sudo tee -a /etc/fstab
 ```
 
-### 2. Clone Repository & Run Host Setup
+---
+
+### Step 2: Clone Repository & Run Setup
+
 ```bash
 git clone https://github.com/mohdanaskhan01/medistock-guardian-medical-supply-tracker.git
 cd medistock-guardian-medical-supply-tracker
 
-# Run the deployment setup script
+# Run the installer script (installs Node.js, Python, Nginx and builds frontend)
 chmod +x aws/ec2/deploy.sh
 ./aws/ec2/deploy.sh
 ```
 
-### 3. Configure Keyless Production Environment
-```bash
-# Copy template — IAM role handles AWS authentication automatically
-cp .env.example .env
+---
 
-# Verify environment configuration
+### Step 3: Configure Environment Variables (`.env`)
+
+Since the instance uses an IAM Role, no access keys are needed here:
+
+```bash
 cat << 'EOF' > .env
 USE_AWS=true
 AWS_REGION=ap-south-2
@@ -47,11 +58,16 @@ CLOUDWATCH_LOG_GROUP=/medistock-guardian/application
 EOF
 ```
 
-### 4. Configure `systemd` Service
+---
+
+### Step 4: Configure & Start systemd Service
+
+This keeps the Python backend running in the background and auto-restarts it if it crashes:
+
 ```bash
 sudo tee /etc/systemd/system/medistock-api.service > /dev/null << 'EOF'
 [Unit]
-Description=MediStock Guardian FastAPI Application
+Description=MediStock Guardian Backend Service
 After=network.target
 
 [Service]
@@ -66,19 +82,25 @@ EnvironmentFile=/home/ubuntu/medistock-guardian-medical-supply-tracker/.env
 WantedBy=multi-user.target
 EOF
 
+# Reload systemd and start the service
 sudo systemctl daemon-reload
 sudo systemctl enable --now medistock-api.service
 sudo systemctl status medistock-api.service --no-pager
 ```
 
-### 5. Configure Nginx Reverse Proxy
+---
+
+### Step 5: Configure Nginx Reverse Proxy
+
+Nginx listens on port 80, serves the frontend files directly, and forwards `/api/` calls to the Python backend on port 8000:
+
 ```bash
 sudo tee /etc/nginx/sites-available/medistock > /dev/null << 'EOF'
 server {
     listen 80;
     server_name _;
 
-    # Static frontend assets built by Vite
+    # Serve static frontend files
     root /home/ubuntu/medistock-guardian-medical-supply-tracker/dist;
     index index.html;
 
@@ -86,7 +108,7 @@ server {
         try_files $uri $uri/ /index.html;
     }
 
-    # Internal API reverse proxy
+    # Forward API requests to FastAPI backend
     location /api/ {
         proxy_pass http://127.0.0.1:8000;
         proxy_http_version 1.1;
@@ -98,20 +120,26 @@ server {
 }
 EOF
 
+# Enable configuration and restart Nginx
 sudo ln -sf /etc/nginx/sites-available/medistock /etc/nginx/sites-enabled/
 sudo rm -f /etc/nginx/sites-enabled/default
 sudo nginx -t && sudo systemctl restart nginx
 ```
 
-### 6. Attach EventBridge Scheduled Rule to Lambda
+---
+
+### Step 6: Set up Daily Monitoring Cron (EventBridge + Lambda)
+
+Triggers the monitor Lambda function daily at `07:00 UTC` to check stock levels and expiring batches:
+
 ```bash
-# Create the daily cron rule (triggers at 07:00 UTC)
+# 1. Create EventBridge rule
 aws events put-rule \
     --name MediStockDailyInventoryScan \
     --schedule-expression "cron(0 7 * * ? *)" \
     --region ap-south-2
 
-# Add permission for EventBridge to invoke Lambda
+# 2. Grant EventBridge permission to invoke the Lambda function
 aws lambda add-permission \
     --function-name mediStock-inventory-monitor \
     --statement-id EventBridgeDailyScan \
@@ -120,10 +148,9 @@ aws lambda add-permission \
     --source-arn arn:aws:events:ap-south-2:<AWS_ACCOUNT_ID>:rule/MediStockDailyInventoryScan \
     --region ap-south-2
 
-# Associate target Lambda function with the EventBridge rule
+# 3. Attach the Lambda function as target
 aws events put-targets \
     --rule MediStockDailyInventoryScan \
     --targets "Id"="1","Arn"="arn:aws:lambda:ap-south-2:<AWS_ACCOUNT_ID>:function:mediStock-inventory-monitor" \
     --region ap-south-2
 ```
-
