@@ -1,0 +1,525 @@
+{
+  "locations": [
+    {
+      "id": "LOC-01",
+      "name": "Main Clinic Supply Room",
+      "code": "CLN-104",
+      "zone": "Ground Floor · Room 104",
+      "temperatureSpec": "18–22°C Ambient",
+      "capacityNote": "Primary shelving bays A1–D4",
+      "createdAt": "2026-08-25T05:09:31.718Z"
+    },
+    {
+      "id": "LOC-02",
+      "name": "Pharmacy Controlled Vault",
+      "code": "PHM-B02",
+      "zone": "Wing B · Suite B2",
+      "temperatureSpec": "15–20°C Dry Storage",
+      "capacityNote": "Bulk cartons and sterile trays",
+      "createdAt": "2026-08-25T05:09:31.719Z"
+    },
+    {
+      "id": "LOC-03",
+      "name": "First-Aid Station North",
+      "code": "FAD-N01",
+      "zone": "East Triage Bay",
+      "temperatureSpec": "18–24°C Ambient",
+      "capacityNote": "Rapid-access cabinets 1–3",
+      "createdAt": "2026-09-09T05:09:31.719Z"
+    },
+    {
+      "id": "LOC-04",
+      "name": "Outpatient Procedure Cabinet",
+      "code": "OPC-201",
+      "zone": "Second Floor · Exam Suite 201",
+      "temperatureSpec": "18–22°C Ambient",
+      "capacityNote": "Daily procedure consumables",
+      "createdAt": "2026-09-24T05:09:31.719Z"
+    }
+  ],
+  "supplies": [
+    {
+      "id": "SUP-101",
+      "sku": "WND-GZ44",
+      "name": "Sterile Gauze Pads (4×4 in)",
+      "category": "Wound Care",
+      "unit": "packs",
+      "minStockLevel": 50,
+      "defaultLocationId": "LOC-03",
+      "preferredSupplier": "MedLine Clinical Supply",
+      "unitCost": 6.5,
+      "createdAt": "2026-08-30T05:09:31.719Z"
+    },
+    {
+      "id": "SUP-102",
+      "sku": "PPE-NGM1",
+      "name": "Nitrile Exam Gloves (Medium)",
+      "category": "PPE",
+      "unit": "boxes",
+      "minStockLevel": 40,
+      "defaultLocationId": "LOC-01",
+      "preferredSupplier": "Apex Healthcare Distributors",
+      "unitCost": 11.2,
+      "createdAt": "2026-08-30T05:09:31.719Z"
+    },
+    {
+      "id": "SUP-103",
+      "sku": "INJ-SY05",
+      "name": "Disposable Luer-Lock Syringes (5 mL)",
+      "category": "Injection Supplies",
+      "unit": "boxes",
+      "minStockLevel": 30,
+      "defaultLocationId": "LOC-02",
+      "preferredSupplier": "SterilCore Medical Co.",
+      "unitCost": 18.75,
+      "createdAt": "2026-09-04T05:09:31.719Z"
+    },
+    {
+      "id": "SUP-104",
+      "sku": "WND-NS50",
+      "name": "0.9% Sodium Chloride Irrigation (500 mL)",
+      "category": "Wound Care",
+      "unit": "bottles",
+      "minStockLevel": 25,
+      "defaultLocationId": "LOC-02",
+      "preferredSupplier": "Pacific Pharma Logistics",
+      "unitCost": 4.8,
+      "createdAt": "2026-09-04T05:09:31.719Z"
+    },
+    {
+      "id": "SUP-105",
+      "sku": "FAD-ST01",
+      "name": "Adhesive Surgical Tape (1 in)",
+      "category": "First Aid",
+      "unit": "rolls",
+      "minStockLevel": 60,
+      "defaultLocationId": "LOC-03",
+      "preferredSupplier": "MedLine Clinical Supply",
+      "unitCost": 2.9,
+      "createdAt": "2026-09-14T05:09:31.719Z"
+    },
+    {
+      "id": "SUP-106",
+      "sku": "ANT-AP70",
+      "name": "70% Isopropyl Alcohol Prep Pads",
+      "category": "Antiseptics",
+      "unit": "boxes",
+      "minStockLevel": 35,
+      "defaultLocationId": "LOC-04",
+      "preferredSupplier": "Apex Healthcare Distributors",
+      "unitCost": 5.4,
+      "createdAt": "2026-09-19T05:09:31.719Z"
+    },
+    {
+      "id": "SUP-107",
+      "sku": "DGN-PC01",
+      "name": "Digital Thermometer Probe Covers",
+      "category": "Diagnostics",
+      "unit": "boxes",
+      "minStockLevel": 20,
+      "defaultLocationId": "LOC-04",
+      "preferredSupplier": "Vanguard Diagnostics",
+      "unitCost": 9.6,
+      "createdAt": "2026-09-29T05:09:31.719Z"
+    },
+    {
+      "id": "SUP-108",
+      "sku": "FAD-EB03",
+      "name": "Elastic Compression Bandages (3 in)",
+      "category": "First Aid",
+      "unit": "rolls",
+      "minStockLevel": 30,
+      "defaultLocationId": "LOC-01",
+      "preferredSupplier": "MedLine Clinical Supply",
+      "unitCost": 3.75,
+      "createdAt": "2026-10-04T05:09:31.719Z"
+    }
+  ],
+  "batches": [
+    {
+      "id": "BAT-201",
+      "batchNumber": "GZ-2026-041",
+      "supplyId": "SUP-101",
+      "locationId": "LOC-03",
+      "quantity": 18,
+      "initialQuantity": 60,
+      "expiryDate": "2027-04-17",
+      "receivedDate": "2026-10-12",
+      "supplierName": "MedLine Clinical Supply",
+      "documentId": "DOC-1001",
+      "notes": "Primary First-Aid North stock — depleted rapidly after triage shift"
+    },
+    {
+      "id": "BAT-202",
+      "batchNumber": "GZ-2026-089",
+      "supplyId": "SUP-101",
+      "locationId": "LOC-01",
+      "quantity": 14,
+      "initialQuantity": 40,
+      "expiryDate": "2027-06-21",
+      "receivedDate": "2026-11-04",
+      "supplierName": "MedLine Clinical Supply",
+      "notes": "Reserve shelf B2"
+    },
+    {
+      "id": "BAT-203",
+      "batchNumber": "NG-2026-112",
+      "supplyId": "SUP-102",
+      "locationId": "LOC-01",
+      "quantity": 56,
+      "initialQuantity": 80,
+      "expiryDate": "2027-09-09",
+      "receivedDate": "2026-10-24",
+      "supplierName": "Apex Healthcare Distributors",
+      "documentId": "DOC-1002"
+    },
+    {
+      "id": "BAT-204",
+      "batchNumber": "NG-2026-148",
+      "supplyId": "SUP-102",
+      "locationId": "LOC-04",
+      "quantity": 30,
+      "initialQuantity": 40,
+      "expiryDate": "2027-10-29",
+      "receivedDate": "2026-11-13",
+      "supplierName": "Apex Healthcare Distributors"
+    },
+    {
+      "id": "BAT-205",
+      "batchNumber": "SY-2026-022",
+      "supplyId": "SUP-103",
+      "locationId": "LOC-02",
+      "quantity": 54,
+      "initialQuantity": 60,
+      "expiryDate": "2027-06-06",
+      "receivedDate": "2026-10-29",
+      "supplierName": "SterilCore Medical Co."
+    },
+    {
+      "id": "BAT-206",
+      "batchNumber": "NS-2025-884",
+      "supplyId": "SUP-104",
+      "locationId": "LOC-02",
+      "quantity": 12,
+      "initialQuantity": 36,
+      "expiryDate": "2026-12-02",
+      "receivedDate": "2026-07-26",
+      "supplierName": "Pacific Pharma Logistics",
+      "notes": "Prioritize FEFO usage before expiry"
+    },
+    {
+      "id": "BAT-207",
+      "batchNumber": "NS-2026-309",
+      "supplyId": "SUP-104",
+      "locationId": "LOC-01",
+      "quantity": 26,
+      "initialQuantity": 30,
+      "expiryDate": "2027-05-04",
+      "receivedDate": "2026-11-09",
+      "supplierName": "Pacific Pharma Logistics"
+    },
+    {
+      "id": "BAT-208",
+      "batchNumber": "ST-2026-077",
+      "supplyId": "SUP-105",
+      "locationId": "LOC-03",
+      "quantity": 44,
+      "initialQuantity": 90,
+      "expiryDate": "2027-07-31",
+      "receivedDate": "2026-10-19",
+      "supplierName": "MedLine Clinical Supply"
+    },
+    {
+      "id": "BAT-209",
+      "batchNumber": "AP-2025-512",
+      "supplyId": "SUP-106",
+      "locationId": "LOC-04",
+      "quantity": 8,
+      "initialQuantity": 30,
+      "expiryDate": "2026-11-19",
+      "receivedDate": "2026-05-27",
+      "supplierName": "Apex Healthcare Distributors",
+      "notes": "Quarantined on top shelf — awaiting disposal log"
+    },
+    {
+      "id": "BAT-210",
+      "batchNumber": "AP-2026-410",
+      "supplyId": "SUP-106",
+      "locationId": "LOC-01",
+      "quantity": 60,
+      "initialQuantity": 60,
+      "expiryDate": "2027-10-04",
+      "receivedDate": "2026-11-15",
+      "supplierName": "Apex Healthcare Distributors"
+    },
+    {
+      "id": "BAT-211",
+      "batchNumber": "PC-2026-019",
+      "supplyId": "SUP-107",
+      "locationId": "LOC-04",
+      "quantity": 42,
+      "initialQuantity": 50,
+      "expiryDate": "2028-01-07",
+      "receivedDate": "2026-11-01",
+      "supplierName": "Vanguard Diagnostics"
+    },
+    {
+      "id": "BAT-212",
+      "batchNumber": "EB-2026-064",
+      "supplyId": "SUP-108",
+      "locationId": "LOC-01",
+      "quantity": 19,
+      "initialQuantity": 35,
+      "expiryDate": "2026-12-14",
+      "receivedDate": "2026-08-20",
+      "supplierName": "MedLine Clinical Supply"
+    },
+    {
+      "id": "BAT-213",
+      "batchNumber": "EB-2026-208",
+      "supplyId": "SUP-108",
+      "locationId": "LOC-03",
+      "quantity": 28,
+      "initialQuantity": 30,
+      "expiryDate": "2027-08-25",
+      "receivedDate": "2026-11-11",
+      "supplierName": "MedLine Clinical Supply"
+    }
+  ],
+  "movements": [
+    {
+      "id": "MOV-301",
+      "type": "IN",
+      "supplyId": "SUP-106",
+      "batchId": "BAT-210",
+      "batchNumber": "AP-2026-410",
+      "locationId": "LOC-01",
+      "quantity": 60,
+      "resultingBatchQuantity": 60,
+      "resultingSupplyTotal": 68,
+      "reason": "Scheduled monthly pharmacy replenishment",
+      "referenceCode": "PO-2026-0412",
+      "performedBy": "Elena Vance",
+      "performedByRole": "Pharmacy Stock Manager",
+      "timestamp": "2026-11-15T02:09:31.719Z"
+    },
+    {
+      "id": "MOV-302",
+      "type": "OUT",
+      "supplyId": "SUP-102",
+      "batchId": "BAT-204",
+      "batchNumber": "NG-2026-148",
+      "locationId": "LOC-04",
+      "quantity": 10,
+      "resultingBatchQuantity": 30,
+      "resultingSupplyTotal": 86,
+      "reason": "Issued to Outpatient Procedure rooms 201–204",
+      "referenceCode": "REQ-8821",
+      "performedBy": "Marcus Reid",
+      "performedByRole": "Clinic Inventory Staff",
+      "timestamp": "2026-11-18T03:09:31.719Z"
+    },
+    {
+      "id": "MOV-303",
+      "type": "OUT",
+      "supplyId": "SUP-105",
+      "batchId": "BAT-208",
+      "batchNumber": "ST-2026-077",
+      "locationId": "LOC-03",
+      "quantity": 22,
+      "resultingBatchQuantity": 44,
+      "resultingSupplyTotal": 44,
+      "reason": "First-Aid mobile kit restock for community health drive",
+      "referenceCode": "REQ-8840",
+      "performedBy": "Priya Nair",
+      "performedByRole": "First-Aid Coordinator",
+      "timestamp": "2026-11-20T01:09:31.719Z"
+    },
+    {
+      "id": "MOV-304",
+      "type": "DISCARDED",
+      "supplyId": "SUP-104",
+      "batchId": "BAT-206",
+      "batchNumber": "NS-2025-884",
+      "locationId": "LOC-02",
+      "quantity": 4,
+      "resultingBatchQuantity": 12,
+      "resultingSupplyTotal": 38,
+      "reason": "Tamper seal compromised during shelf inspection",
+      "referenceCode": "DSC-109",
+      "performedBy": "Elena Vance",
+      "performedByRole": "Pharmacy Stock Manager",
+      "timestamp": "2026-11-21T04:09:31.719Z"
+    },
+    {
+      "id": "MOV-305",
+      "type": "OUT",
+      "supplyId": "SUP-101",
+      "batchId": "BAT-201",
+      "batchNumber": "GZ-2026-041",
+      "locationId": "LOC-03",
+      "quantity": 24,
+      "resultingBatchQuantity": 18,
+      "resultingSupplyTotal": 32,
+      "reason": "Issued to First-Aid Station North wound care carts",
+      "referenceCode": "REQ-8894",
+      "performedBy": "Priya Nair",
+      "performedByRole": "First-Aid Coordinator",
+      "timestamp": "2026-11-22T00:09:31.719Z"
+    }
+  ],
+  "reorders": [
+    {
+      "id": "REO-401",
+      "supplyId": "SUP-101",
+      "requestedQuantity": 100,
+      "supplierName": "MedLine Clinical Supply",
+      "status": "Pending",
+      "requestedBy": "Priya Nair",
+      "requestedAt": "2026-11-22T01:09:31.719Z",
+      "expectedDeliveryDate": "2026-11-27",
+      "purchaseOrderNumber": "PO-2026-0488",
+      "notes": "Triggered by low-stock alert (32/50 packs remaining)",
+      "documentId": "DOC-1001"
+    },
+    {
+      "id": "REO-402",
+      "supplyId": "SUP-105",
+      "requestedQuantity": 80,
+      "supplierName": "MedLine Clinical Supply",
+      "status": "Ordered",
+      "requestedBy": "Elena Vance",
+      "requestedAt": "2026-11-20T23:09:31.719Z",
+      "expectedDeliveryDate": "2026-11-25",
+      "purchaseOrderNumber": "PO-2026-0481",
+      "notes": "Confirmed by vendor dispatch desk"
+    },
+    {
+      "id": "REO-403",
+      "supplyId": "SUP-106",
+      "requestedQuantity": 60,
+      "supplierName": "Apex Healthcare Distributors",
+      "status": "Received",
+      "requestedBy": "Elena Vance",
+      "requestedAt": "2026-11-09T05:09:31.719Z",
+      "expectedDeliveryDate": "2026-11-15",
+      "receivedAt": "2026-11-15T02:09:31.719Z",
+      "purchaseOrderNumber": "PO-2026-0412",
+      "notes": "Delivered to Main Clinic Supply Room (Batch AP-2026-410)",
+      "documentId": "DOC-1002"
+    }
+  ],
+  "alerts": [
+    {
+      "id": "ALT-SOON-BAT-206",
+      "type": "EXPIRING_SOON",
+      "severity": "critical",
+      "status": "Active",
+      "supplyId": "SUP-104",
+      "batchId": "BAT-206",
+      "title": "Expiring soon: NS-2025-884",
+      "message": "12 bottles of 0.9% Sodium Chloride Irrigation (500 mL) (Batch NS-2025-884) expires in 9 day(s) on 2026-12-02. Prioritize FEFO issue or schedule replacement.",
+      "currentValue": "9d remaining",
+      "thresholdValue": "2026-12-02",
+      "snsTopicArn": "arn:aws:sns:ap-south-2:123456789012:MediStockAlertsTopic",
+      "notifiedRoles": [
+        "Pharmacy Stock Manager",
+        "First-Aid Coordinator"
+      ],
+      "createdAt": "2026-11-23T05:09:31.719Z"
+    },
+    {
+      "id": "ALT-EXP-BAT-209",
+      "type": "EXPIRED",
+      "severity": "critical",
+      "status": "Active",
+      "supplyId": "SUP-106",
+      "batchId": "BAT-209",
+      "title": "Expired batch: AP-2025-512",
+      "message": "8 boxes of 70% Isopropyl Alcohol Prep Pads (Batch AP-2025-512) expired 4 day(s) ago on 2026-11-19. Quarantine and record as discarded.",
+      "currentValue": "Expired 4d ago",
+      "thresholdValue": "2026-11-19",
+      "snsTopicArn": "arn:aws:sns:ap-south-2:123456789012:MediStockAlertsTopic",
+      "notifiedRoles": [
+        "Pharmacy Stock Manager",
+        "Clinic Inventory Staff"
+      ],
+      "createdAt": "2026-11-23T05:09:31.719Z"
+    },
+    {
+      "id": "ALT-LOW-SUP-101",
+      "type": "LOW_STOCK",
+      "severity": "warning",
+      "status": "Active",
+      "supplyId": "SUP-101",
+      "title": "Low stock: Sterile Gauze Pads (4×4 in)",
+      "message": "Sterile Gauze Pads (4×4 in) (WND-GZ44) has 32 usable packs, below the minimum threshold of 50 packs. Initiate a replenishment reorder.",
+      "currentValue": "32 packs",
+      "thresholdValue": "Min 50 packs",
+      "snsTopicArn": "arn:aws:sns:ap-south-2:123456789012:MediStockAlertsTopic",
+      "notifiedRoles": [
+        "First-Aid Coordinator",
+        "Pharmacy Stock Manager"
+      ],
+      "createdAt": "2026-11-23T05:09:31.719Z"
+    },
+    {
+      "id": "ALT-LOW-SUP-105",
+      "type": "LOW_STOCK",
+      "severity": "warning",
+      "status": "Active",
+      "supplyId": "SUP-105",
+      "title": "Low stock: Adhesive Surgical Tape (1 in)",
+      "message": "Adhesive Surgical Tape (1 in) (FAD-ST01) has 44 usable rolls, below the minimum threshold of 60 rolls. Initiate a replenishment reorder.",
+      "currentValue": "44 rolls",
+      "thresholdValue": "Min 60 rolls",
+      "snsTopicArn": "arn:aws:sns:ap-south-2:123456789012:MediStockAlertsTopic",
+      "notifiedRoles": [
+        "First-Aid Coordinator",
+        "Pharmacy Stock Manager"
+      ],
+      "createdAt": "2026-11-23T05:09:31.719Z"
+    },
+    {
+      "id": "ALT-SOON-BAT-212",
+      "type": "EXPIRING_SOON",
+      "severity": "warning",
+      "status": "Active",
+      "supplyId": "SUP-108",
+      "batchId": "BAT-212",
+      "title": "Expiring soon: EB-2026-064",
+      "message": "19 rolls of Elastic Compression Bandages (3 in) (Batch EB-2026-064) expires in 21 day(s) on 2026-12-14. Prioritize FEFO issue or schedule replacement.",
+      "currentValue": "21d remaining",
+      "thresholdValue": "2026-12-14",
+      "snsTopicArn": "arn:aws:sns:ap-south-2:123456789012:MediStockAlertsTopic",
+      "notifiedRoles": [
+        "Pharmacy Stock Manager",
+        "First-Aid Coordinator"
+      ],
+      "createdAt": "2026-11-23T05:09:31.719Z"
+    }
+  ],
+  "documents": [
+    {
+      "id": "DOC-1001",
+      "fileName": "MedLine_PackingSlip_PO-2026-0488.txt",
+      "contentType": "text/plain",
+      "sizeBytes": 342,
+      "s3Key": "supplier-docs/2026/MedLine_PackingSlip_PO-2026-0488.txt",
+      "uploadedAt": "2026-11-22T01:09:31.719Z",
+      "uploadedBy": "Elena Vance",
+      "dataUrl": "data:text/plain;charset=utf-8,MEDLINE%20CLINICAL%20SUPPLY%20-%20PURCHASE%20ORDER%20SUMMARY%0APO%20Number%3A%20PO-2026-0488%0AItem%3A%20Sterile%20Gauze%20Pads%20(4x4%20in)%20%5BSKU%3A%20WND-GZ44%5D%0AQuantity%20Ordered%3A%20100%20packs%0AUnit%20Cost%3A%20%246.50%0AEstimated%20Total%3A%20%24650.00%0ADestination%3A%20First-Aid%20Station%20North%20(FAD-N01)%0A"
+    },
+    {
+      "id": "DOC-1002",
+      "fileName": "Apex_Invoice_Batch_NG-2026-112.txt",
+      "contentType": "text/plain",
+      "sizeBytes": 318,
+      "s3Key": "supplier-docs/2026/Apex_Invoice_Batch_NG-2026-112.txt",
+      "uploadedAt": "2026-11-15T03:09:31.719Z",
+      "uploadedBy": "Elena Vance",
+      "dataUrl": "data:text/plain;charset=utf-8,APEX%20HEALTHCARE%20DISTRIBUTORS%20-%20SUPPLIER%20INVOICE%0AInvoice%20Ref%3A%20INV-90418%0ABatch%3A%20NG-2026-112%0AItem%3A%20Nitrile%20Exam%20Gloves%20(Medium)%20%5BSKU%3A%20PPE-NGM1%5D%0AQuantity%20Shipped%3A%2080%20boxes%0ALot%20Inspection%3A%20Passed%20QA%20Sterility%20%26%20Packaging%20Check%0A"
+    }
+  ],
+  "lastMonitorRunAt": "2026-11-23T04:09:31.719Z"
+}

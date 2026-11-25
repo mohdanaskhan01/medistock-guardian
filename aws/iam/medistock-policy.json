@@ -1,0 +1,56 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "MediStockDynamoDBAccess",
+      "Effect": "Allow",
+      "Action": [
+        "dynamodb:GetItem",
+        "dynamodb:PutItem",
+        "dynamodb:UpdateItem",
+        "dynamodb:Query",
+        "dynamodb:Scan"
+      ],
+      "Resource": [
+        "arn:aws:dynamodb:*:*:table/MediStock_Locations",
+        "arn:aws:dynamodb:*:*:table/MediStock_Supplies",
+        "arn:aws:dynamodb:*:*:table/MediStock_Batches",
+        "arn:aws:dynamodb:*:*:table/MediStock_Movements",
+        "arn:aws:dynamodb:*:*:table/MediStock_Reorders",
+        "arn:aws:dynamodb:*:*:table/MediStock_Alerts",
+        "arn:aws:dynamodb:*:*:table/MediStock_Documents"
+      ]
+    },
+    {
+      "Sid": "MediStockS3SupplierDocuments",
+      "Effect": "Allow",
+      "Action": [
+        "s3:GetObject",
+        "s3:PutObject",
+        "s3:ListBucket"
+      ],
+      "Resource": [
+        "arn:aws:s3:::medistock-guardian-supplier-docs",
+        "arn:aws:s3:::medistock-guardian-supplier-docs/*"
+      ]
+    },
+    {
+      "Sid": "MediStockSNSAlertPublishing",
+      "Effect": "Allow",
+      "Action": [
+        "sns:Publish"
+      ],
+      "Resource": "arn:aws:sns:*:*:MediStockAlertsTopic"
+    },
+    {
+      "Sid": "MediStockCloudWatchLogging",
+      "Effect": "Allow",
+      "Action": [
+        "logs:CreateLogGroup",
+        "logs:CreateLogStream",
+        "logs:PutLogEvents"
+      ],
+      "Resource": "arn:aws:logs:*:*:log-group:/medistock-guardian/*"
+    }
+  ]
+}

@@ -1,0 +1,6 @@
+{
+  "name": "MediStock Guardian \u2013 Medical Supply Tracker",
+  "description": "A medical inventory management application that tracks supply quantities, batches, expiry dates, and stock movements while notifying authorized staff about shortages and upcoming expiries.",
+  "requestFramePermissions": [],
+  "majorCapabilities": []
+}
