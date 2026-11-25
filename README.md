@@ -296,6 +296,6 @@ aws events put-targets \
 **Mohammed Anasullah Khan**  
 *AWS Cloud & DevOps Engineer | Hyderabad, India*
 
-- **Portfolio:** [https://mohdanaskhan01.github.io/anasullah-cloud-devops-portfolio/](https://mohdanaskhan01.github.io/anasullah-cloud-devops-portfolio/)
+- **Portfolio:** [https://mohdanaskhan01.github.io/anasullah-portfolio/](https://mohdanaskhan01.github.io/anasullah-portfolio/)
 - **GitHub:** [https://github.com/mohdanaskhan01](https://github.com/mohdanaskhan01)
 - **LinkedIn:** [https://www.linkedin.com/in/mohammed-anasullah-khan/](https://www.linkedin.com/in/mohammed-anasullah-khan/)
